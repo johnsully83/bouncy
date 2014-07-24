@@ -1,0 +1,36 @@
+<beans xmlns="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+    	http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
+
+	<beans profile="cloudtesting">
+	</beans>
+
+	<beans profile="localtesting">
+		<bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+			<property name="packagesToScan">
+				<list>
+					<value>com.phossil.model</value>
+				</list>
+			</property>
+			<property name="dataSource" ref="dataSource" /><property name="jpaVendorAdapter" ref="jpaVendorAdapterHsql" />
+			<property name="jpaVendorAdapter" ref="jpaVendorAdapterHsql" />
+			<property name="jpaProperties">
+				<props>
+					<prop key="hibernate.hbm2ddl.auto">create</prop>
+					<prop key="hibernate.show_sql">true</prop>
+					<prop key="hibernate.format_sql">true</prop>
+				</props>
+			</property>
+		</bean>
+
+		<bean id="jpaVendorAdapterHsql" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+			<property name="databasePlatform" value="org.hibernate.dialect.HSQLDialect" />
+			<property name="showSql" value="true" />
+			<property name="generateDdl" value="false" />
+			<property name="database" value="HSQL" />
+		</bean>
+
+		<jdbc:embedded-database id="dataSource" />
+	</beans>
+</beans>
