@@ -20,5 +20,27 @@
 		<li class="ball drop orange"></li>
 		<li class="ball drop purple"></li>
 	</ul>
+	<div id="scoreboard">
+		<table>
+			<tbody>
+				<tr>
+					<td>
+						Score:
+					</td>
+					<td id="score">
+						0
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Level:
+					</td>
+					<td id="level">
+						1
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
 </body>
 </html>

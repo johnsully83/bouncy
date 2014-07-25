@@ -1,38 +1,110 @@
 $(document).ready(function() {
+    $.drop({ multi: true });
+   
     $.bouncy = {};
     $.bouncy.colors = [ 'red', 'green', 'blue', 'orange', 'purple' ];
     $.bouncy.speed = 2000;
     $.bouncy.length = 100;
     $.bouncy.moves = 0;
+    $.bouncy.level = 1;
+    $.bouncy.score = 0;
     $.bouncy.moveDataMap = {
     	0 : {
+    		level : 1,
     		speed : 2000,
     		length : 100
     	},
     	10 : {
+    		level : 2,
     		speed : 1750,
     		length : 150
     	},
     	30 : {
+    		level : 3,
     		speed : 1500,
     		length : 200
     	},
     	70 : {
+    		level : 4,
     		speed : 1250,
     		length : 250
     	},
     	125 : {
+    		level : 5,
     		speed : 875,
     		length : 325
     	},
     	200 : {
+    		level : 6,
     		speed : 550,
     		length : 400
     	},
     	300 : {
+    		level : 7,
     		speed : 200,
     		length : 500
+    	},
+    	400 : {
+    		level : 8,
+    		speed : 180,
+    		length : 600
+    	},
+    	500 : {
+    		level : 9,
+    		speed : 170,
+    		length : 700
+    	},
+    	1000 : {
+    		level : 10,
+    		speed : 150,
+    		length : 850
     	}
+    };
+    
+    $.bouncy.scoring = {
+    	click : 1,
+    	selectMultipliers : {
+    		"3" : 1,
+    		"5" : 2,
+    		"10" : 5,
+    		"15" : 10,
+    		"20" : 20,
+    		"10000" : 25
+    	},
+    	select : function(numberOfBalls, color) {
+    		var multiplier = 1;
+    		
+    		if(numberOfBalls < 3) {
+    			multiplier = $.bouncy.scoring.selectMultipliers["3"];
+    		} else if(numberOfBalls < 5) {
+    			multiplier = $.bouncy.scoring.selectMultipliers["5"];
+    		} else if(numberOfBalls < 10) {
+    			multiplier = $.bouncy.scoring.selectMultipliers["10"];
+    		} else if(numberOfBalls < 15) {
+    			multiplier = $.bouncy.scoring.selectMultipliers["15"];
+    		} else if(numberOfBalls < 20) {
+    			multiplier = $.bouncy.scoring.selectMultipliers["20"];
+    		} else {
+    			multiplier = $.bouncy.scoring.selectMultipliers["10000"];
+    		}
+    		
+    		if($('.'+color).length == 0) {
+    			multiplier = multiplier * 5;
+    		}
+    		
+    		return numberOfBalls * multiplier * $.bouncy.level;
+    	}
+    };
+    
+    $.bouncy.updateScoreboard = function() {
+    	$('#score').text($.bouncy.score);
+    	$('#level').text($.bouncy.level);
+    };
+    
+    $.bouncy.incrementScore = function( value ) {
+    	$.bouncy.score += value;
+    	
+    	$.bouncy.updateScoreboard();
     };
     
     $.bouncy.incrementMoveCount = function() {
@@ -47,6 +119,9 @@ $(document).ready(function() {
     	if(moveData) {
     		$.bouncy.speed = moveData.speed;
     		$.bouncy.length = moveData.length;
+    		
+    		$.bouncy.level = moveData.level;
+    		$.bouncy.updateScoreboard();
     	}
     };
     
@@ -73,27 +148,68 @@ $(document).ready(function() {
     	return $(this);
     };
     
-    $.fn.doBounce = function() {
+    $.fn.randomLeft = function() {
+    	var diameter = $(this).width();
         var position = $(this).position();
         var pageWidth = $(document).width();
         
-        var random = Math.round((Math.random() * $.bouncy.length) - ($.bouncy.length / 2));
+        var randomLeft = Math.round((Math.random() * $.bouncy.length) - ($.bouncy.length / 2));
         
-        if(position.left + random + 25 > pageWidth || position.left + random < 0) {
-             random = -random;   
+        if(position.left + randomLeft + 25 > pageWidth || position.left + randomLeft < 0) {
+        	randomLeft = -randomLeft;
         }
         
-        var horizontal = '+='+random;
-        
-        random = Math.round((Math.random() * $.bouncy.length) - ($.bouncy.length / 2));
-        
+        return randomLeft;
+    };
+    
+    $.fn.randomTop = function() {
+    	var diameter = $(this).width();
+        var position = $(this).position();
         var pageHeight = $(document).height();
         
-        if(position.top + random + 25 > pageHeight || position.top + random < 0) {
-             random = -random;   
+        var randomTop = Math.round((Math.random() * $.bouncy.length) - ($.bouncy.length / 2));
+        
+        if(position.top + randomTop + diameter > pageHeight || position.top + randomTop < 0) {
+        	randomTop = -randomTop;   
         }
         
-        var vertical = '+='+random;
+        return randomTop;
+    };
+    
+    $.fn.isInScoreboard = function(left, top) {
+        var position = $(this).position();
+        var diameter = $(this).width();
+        
+        var scoreboard = $('#scoreboard');
+        var scoreboardPosition = {
+        	top: scoreboard.position().top,
+        	left: scoreboard.position().left,
+        	bottom: scoreboard.position().top+scoreboard.height(),
+        	right: scoreboard.position().left+scoreboard.width()
+        };
+        
+        if((position.left+left) < scoreboardPosition.right 
+        	&& (position.top+top) < scoreboardPosition.bottom
+        	&& (position.top+top+diameter) > scoreboardPosition.top
+        	&& (position.left+left+diameter) > scoreboardPosition.left) {
+
+        	return true;
+        }
+        
+        return false;
+    };
+    
+    $.fn.doBounce = function() {
+    	var randomTop = $(this).randomTop();
+    	var randomLeft = $(this).randomLeft();
+        
+    	if($(this).isInScoreboard(randomLeft, randomTop)) {
+    		randomTop = -randomTop;
+    		randomLeft = -randomLeft;
+    	}
+    	
+        var horizontal = '+='+randomLeft;
+        var vertical = '+='+randomTop;
         
         $(this).animate({
             left: horizontal,
@@ -115,6 +231,7 @@ $(document).ready(function() {
                 $(this).cloneBall();
                 
             	$.bouncy.incrementMoveCount();
+            	$.bouncy.incrementScore($.bouncy.scoring.click);
             } else {
                 $(this).stop(true, false).data('stopped', true);
             }
@@ -126,16 +243,19 @@ $(document).ready(function() {
     var pageWidth = $(document).width();
     var pageHeight = $(document).height();
     
+    var largestOffsetFromCenter = Math.round(($('.ball').length-1)/2);
+    
     $('.ball').each(function(index) {
+    	var diameter = $(this).width();
+    	
         $(this).css({
-            top: (pageHeight/2-25),
-            left: (pageWidth/2-35*(index-2)-25) 
+            top: (pageHeight/2-diameter),
+            left: (pageWidth/2-(diameter+10)*(index-largestOffsetFromCenter)-diameter) 
         });
     }).bounce();
     
     $(document).on('mousedown', function() {
         $('.ball').stop(true, false);
-        console.log($('.ball').length);
     }).on('mouseup', function() {
         $('.ball').not(function(index, element) {
         	return $(element).data('stopped');
@@ -180,6 +300,10 @@ $(document).ready(function() {
 					$(this).cloneBall();
 				});
 			} else if(selectedColors.length == 1 && $('.dropped').length > 1) {
+				var points = $.bouncy.scoring.select($('.dropped').length, selectedColors[0]);
+
+				$.bouncy.incrementScore(points);
+				
 				$('.dropped').remove();
 			}
 		}
@@ -190,8 +314,6 @@ $(document).ready(function() {
 			}
 		});
 	});
-    
-    $.drop({ multi: true });
 });
 
 //http://threedubmedia.com/code/event/drop/demo/selection
