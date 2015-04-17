@@ -1,0 +1,91 @@
+@import "../library/elements.less";
+//@import url(http://fonts.googleapis.com/css?family=Fenix);
+
+@red: #C23;
+@green: #4B7;
+@blue: #39D;
+@orange: #F93;
+@purple: #847;
+
+@ball-width: 25px;
+
+body {
+	font-family: Fenix, Arial, sans-serif;
+}
+
+#scoreboard {
+	position: absolute;
+	top: @ball-width;
+	left: @ball-width;
+	background-color: lighten(@orange, 10%);
+	.rounded(20px);
+	.opacity(0.5);
+	
+	table {
+		margin: auto;
+		padding: 10px;
+		
+		td {
+			padding: 10px;
+		}
+	}
+}
+
+ul {
+	list-style: none;
+}
+
+.ball {
+    border-radius: 50%;
+    height: @ball-width;
+    width: @ball-width;
+    float: left;
+    position: absolute;
+}
+
+.selection {
+	opacity: .65;
+	background-color: lighten(@blue, 10%);
+	position: absolute;
+	border: 1px solid darken(@blue, 10%);
+}
+
+.red {
+    background-color: @red;
+}
+
+.green {
+    background-color: @green;
+}
+
+.blue {
+    background-color: @blue;
+}
+
+.orange {
+    background-color: @orange;
+}
+
+.purple {
+    background-color: @purple;
+}
+
+.active.red {
+    background-color: darken(@red, 10%);
+}
+
+.active.green {
+    background-color: darken(@green, 10%);
+}
+
+.active.blue {
+    background-color: darken(@blue, 10%);
+}
+
+.active.orange {
+    background-color: darken(@orange, 10%);
+}
+
+.active.purple {
+    background-color: darken(@purple, 10%);
+}

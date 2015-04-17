@@ -3,6 +3,7 @@ $(document).ready(function() {
    
     $.bouncy = {};
     $.bouncy.colors = [ 'red', 'green', 'blue', 'orange', 'purple' ];
+    $.bouncy.width = 25; 
     $.bouncy.speed = 2000;
     $.bouncy.length = 100;
     $.bouncy.moves = 0;
@@ -249,8 +250,8 @@ $(document).ready(function() {
     	var diameter = $(this).width();
     	
         $(this).css({
-            top: (pageHeight/2-diameter),
-            left: (pageWidth/2-(diameter+10)*(index-largestOffsetFromCenter)-diameter) 
+            top: Math.abs(pageHeight/2-$.bouncy.width),
+            left: Math.abs((pageWidth/2-($.bouncy.width+10)*(index-largestOffsetFromCenter)-$.bouncy.width)) 
         });
     }).bounce();
     
